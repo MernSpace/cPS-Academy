@@ -1,8 +1,7 @@
-"use client"
+"use client";
+
 import { Button } from '@/components/ui/button';
 import { GraduationCap, LogOut, User } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { authService } from '@/lib/supabase';
 import { toast } from 'sonner';
 import {
     DropdownMenu,
@@ -14,18 +13,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export const Navbar = () => {
-    const { user, profile } = useAuth();
-    const navigate = useRouter();
+    const router = useRouter();
+    const [user, setUser] = useState<any>(null);
+
+    // Load user from localStorage
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
 
     const handleLogout = async () => {
-        const { error } = await authService.signOut();
-        if (error) {
-            toast.error('Error logging out');
-        } else {
+        try {
+            // Strapi has no logout endpoint — just clear JWT + user data
+            localStorage.removeItem('jwt');
+            localStorage.removeItem('user');
+            setUser(null);
             toast.success('Logged out successfully');
-            navigate.push('/')
+            router.push('/');
+        } catch {
+            toast.error('Error logging out');
         }
     };
 
@@ -35,7 +46,7 @@ export const Navbar = () => {
                 <div className="flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 text-xl font-bold">
                         <GraduationCap className="h-8 w-8 text-primary" />
-                        <span className="bg-gradient-to-r  from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
                             CPS Academy
                         </span>
                     </Link>
@@ -49,18 +60,20 @@ export const Navbar = () => {
                                 <Link href="/courses">
                                     <Button variant="ghost">Courses</Button>
                                 </Link>
+
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" size="icon">
                                             <User className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
+
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>
                                             <div className="flex flex-col">
-                                                <span>{profile?.full_name || 'User'}</span>
+                                                <span>{user.username || 'User'}</span>
                                                 <span className="text-xs font-normal text-muted-foreground">
-                                                    {profile?.role?.replace('_', ' ') || 'user'}
+                                                    {user.role?.name || 'user'}
                                                 </span>
                                             </div>
                                         </DropdownMenuLabel>
