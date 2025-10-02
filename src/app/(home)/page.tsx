@@ -1,7 +1,6 @@
 "use client"
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Navbar } from '@/components/Navbar';
 import { BookOpen, Users, Award, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -47,7 +46,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
