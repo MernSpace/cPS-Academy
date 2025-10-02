@@ -109,7 +109,6 @@ export default function Auth() {
 
     return (
         <div className="min-h-screen bg-background">
-            <Navbar />
             <div className="container mx-auto px-4 py-16 flex items-center justify-center">
                 <Card className="w-full max-w-md">
                     <CardHeader className="space-y-1">
