@@ -26,7 +26,7 @@ export default function Dashboard() {
 
         const fetchUser = async () => {
             try {
-                const res = await fetch('http://localhost:1337/api/users/me', {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}api/users/me`, {
                     headers: {
                         Authorization: `Bearer ${jwt}`,
                     },

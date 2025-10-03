@@ -39,7 +39,7 @@ export default function Auth() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:1337/api/auth/local', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}api/auth/local`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -83,7 +83,7 @@ export default function Auth() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:1337/api/auth/local/register', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}api/auth/local/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -98,6 +98,12 @@ export default function Auth() {
             if (!res.ok) {
                 throw new Error(data.error?.message || 'Registration failed');
             }
+
+            localStorage.setItem('jwt', data.jwt);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            toast.success('Logged in successfully!');
+            navigate.push('/dashboard');
 
             toast.success('Account created successfully! You can now log in.');
         } catch (error: any) {

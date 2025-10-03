@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BookOpen, Users, Award, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 
 export default function Landing() {
   const features = [
@@ -30,19 +29,6 @@ export default function Landing() {
     },
   ];
 
-  const [data, setData] = useState([])
-
-  useEffect(() => {
-    const featchData = async () => {
-      let res = await fetch("http://localhost:1337/api/articles?populate=*")
-      let jsonData = await res.json()
-      setData(jsonData)
-    }
-    featchData()
-
-  }, [])
-
-  console.log(data)
 
   return (
     <div className="min-h-screen bg-background">

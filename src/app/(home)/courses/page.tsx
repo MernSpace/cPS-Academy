@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,9 +54,9 @@ export default function Courses() {
                     return;
                 }
 
-                const res = await fetch("http://localhost:1337/api/courses?populate=*", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}api/courses?populate=*`, {
                     headers: {
-                        "Authorization": `Bearer ${jwt}`,
+                        Authorization: `Bearer ${jwt}`,
                         "Content-Type": "application/json",
                     },
                 });
@@ -91,7 +90,7 @@ export default function Courses() {
         fetchCourses();
     }, [router]);
 
-    // Helper function to extract plain text from rich text description
+    // ✅ Safely extract text from Strapi’s rich text
     const getDescriptionText = (description: any[]): string => {
         if (!description || !Array.isArray(description)) return "";
 
@@ -106,10 +105,17 @@ export default function Courses() {
             .trim();
     };
 
+    // ✅ Generate a safe thumbnail URL
+    const getThumbnailUrl = (url?: string) => {
+        if (!url) return null;
+        // If it's already a full URL, return it directly
+        if (url.startsWith("http")) return url;
+        // Otherwise, prepend the Strapi backend URL
+        return `${process.env.NEXT_PUBLIC_STRAPI_URL?.replace(/\/$/, "")}${url}`;
+    };
+
     if (loading) {
-        return (
-            <FullScreenLoader title="Loading Courser" />
-        );
+        return <FullScreenLoader title="Loading Courses" />;
     }
 
     return (
@@ -132,10 +138,7 @@ export default function Courses() {
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {courses.map((course) => {
-                            const thumbnailUrl = course.thumbnail?.url
-                                ? `http://localhost:1337${course.thumbnail.url}`
-                                : null;
-
+                            const thumbnailUrl = getThumbnailUrl(course.thumbnail?.url);
                             const descriptionText = getDescriptionText(course.description);
 
                             return (
@@ -163,9 +166,7 @@ export default function Courses() {
                                     <CardHeader className="flex-shrink-0">
                                         <div className="flex items-start justify-between mb-2">
                                             <CardTitle className="text-xl">{course.title}</CardTitle>
-                                            {course.level && (
-                                                <Badge variant="secondary">{course.level}</Badge>
-                                            )}
+                                            {course.level && <Badge variant="secondary">{course.level}</Badge>}
                                         </div>
                                         <CardDescription className="line-clamp-2">
                                             {descriptionText || "No description available"}
