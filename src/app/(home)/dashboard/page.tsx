@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, Users, Code, TrendingUp, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import FullScreenLoader from '@/components/loader';
 
 export default function Dashboard() {
     const router = useRouter();
@@ -52,15 +53,7 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background">
-                <Navbar />
-                <div className="flex items-center justify-center h-[80vh]">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-                        <p className="text-muted-foreground">Loading...</p>
-                    </div>
-                </div>
-            </div>
+            <FullScreenLoader title='Loading' />
         );
     }
 
@@ -113,7 +106,6 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-background">
-            <Navbar />
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">

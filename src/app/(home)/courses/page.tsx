@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 import { toast } from "sonner";
+import FullScreenLoader from "@/components/loader";
+import Image from "next/image";
 
 interface Course {
     id: number;
@@ -106,14 +108,7 @@ export default function Courses() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background">
-                <div className="flex items-center justify-center h-[80vh]">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-                        <p className="text-muted-foreground">Loading courses...</p>
-                    </div>
-                </div>
-            </div>
+            <FullScreenLoader title="Loading Courser" />
         );
     }
 
@@ -146,24 +141,26 @@ export default function Courses() {
                             return (
                                 <Card
                                     key={course.id}
-                                    className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col"
+                                    className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full py-0 pb-6"
                                 >
                                     {thumbnailUrl ? (
-                                        <div className="h-48 overflow-hidden">
-                                            <img
+                                        <div className="h-48 overflow-hidden flex-shrink-0">
+                                            <Image
                                                 src={thumbnailUrl}
                                                 alt={course.title}
+                                                width={400}
+                                                height={192}
                                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                             />
                                         </div>
                                     ) : (
-                                        <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                                        <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0">
                                             <p className="text-4xl font-bold text-muted-foreground">
                                                 {course.title.charAt(0)}
                                             </p>
                                         </div>
                                     )}
-                                    <CardHeader>
+                                    <CardHeader className="flex-shrink-0">
                                         <div className="flex items-start justify-between mb-2">
                                             <CardTitle className="text-xl">{course.title}</CardTitle>
                                             {course.level && (
@@ -174,7 +171,7 @@ export default function Courses() {
                                             {descriptionText || "No description available"}
                                         </CardDescription>
                                     </CardHeader>
-                                    <CardContent className="mt-auto">
+                                    <CardContent className="mt-auto pt-0">
                                         <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
                                             {course.instructor && <span>By {course.instructor}</span>}
                                             {course.duration && (
