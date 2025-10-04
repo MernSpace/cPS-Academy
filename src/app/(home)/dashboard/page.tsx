@@ -2,18 +2,42 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Navbar } from '@/components/Navbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Users, Code, TrendingUp, Lock } from 'lucide-react';
+import { BookOpen, Users, Code, TrendingUp, Lock, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import FullScreenLoader from '@/components/loader';
 
+// ✅ Define proper TypeScript interfaces
+interface UserRole {
+    name: 'student' | 'developer' | 'social_media_manager' | string;
+}
+
+interface User {
+    id: number;
+    username: string;
+    email: string;
+    role: UserRole;
+}
+
+interface DashboardFeature {
+    icon: LucideIcon;
+    title: string;
+    description: string;
+    link?: string;
+}
+
+interface RoleContent {
+    title: string;
+    description: string;
+    features: DashboardFeature[];
+}
+
 export default function Dashboard() {
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     // 🔐 Fetch user info from Strapi
@@ -39,6 +63,7 @@ export default function Dashboard() {
                 const data = await res.json();
                 setUser(data);
             } catch (error) {
+                console.log(error)
                 toast.error('Please login again');
                 localStorage.removeItem('jwt');
                 localStorage.removeItem('user');
@@ -60,7 +85,7 @@ export default function Dashboard() {
     if (!user) return null;
 
     // 🧭 Role-based content
-    const getRoleContent = () => {
+    const getRoleContent = (): RoleContent => {
         switch (user.role?.name) {
             case 'student':
                 return {

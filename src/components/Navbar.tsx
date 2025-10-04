@@ -15,15 +15,34 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+// ✅ Define proper TypeScript interfaces
+interface UserRole {
+    name: string;
+    [key: string]: unknown; // Allow for other role properties
+}
+
+interface NavbarUser {
+    id?: number;
+    username: string;
+    email?: string;
+    role?: UserRole;
+    [key: string]: unknown; // Allow for other user properties
+}
+
 export const Navbar = () => {
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<NavbarUser | null>(null);
 
     // Load user from localStorage
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                localStorage.removeItem('user');
+            }
         }
     }, []);
 

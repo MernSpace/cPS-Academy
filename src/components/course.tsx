@@ -11,21 +11,51 @@ import { toast } from "sonner";
 import FullScreenLoader from "@/components/loader";
 import Image from "next/image";
 
+// ✅ Define proper TypeScript interfaces
+interface DescriptionChild {
+    text: string;
+    [key: string]: unknown; // Allow for other properties that might exist
+}
+
+interface DescriptionBlock {
+    type: string;
+    children: DescriptionChild[];
+    [key: string]: unknown; // Allow for other properties that might exist
+}
+
+interface ThumbnailFormats {
+    thumbnail?: {
+        url: string;
+    };
+    small?: {
+        url: string;
+    };
+    medium?: {
+        url: string;
+    };
+    large?: {
+        url: string;
+    };
+    [key: string]: unknown; // Allow for other format sizes
+}
+
+interface Thumbnail {
+    id: number;
+    documentId: string;
+    name: string;
+    url: string;
+    formats?: ThumbnailFormats;
+}
+
 interface Course {
     id: number;
     documentId: string;
     title: string;
-    description: any[]; // Rich text from Strapi
+    description: DescriptionBlock[]; // Rich text from Strapi with proper typing
     instructor?: string;
     duration?: string;
     level?: string;
-    thumbnail?: {
-        id: number;
-        documentId: string;
-        name: string;
-        url: string;
-        formats?: any;
-    };
+    thumbnail?: Thumbnail;
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
@@ -40,8 +70,6 @@ export default function Courses() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-
-
                 const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}api/courses?populate=*`, {
                     headers: {
                         "Content-Type": "application/json",
@@ -77,14 +105,14 @@ export default function Courses() {
         fetchCourses();
     }, [router]);
 
-    // ✅ Safely extract text from Strapi’s rich text
-    const getDescriptionText = (description: any[]): string => {
+    // ✅ Safely extract text from Strapi's rich text with proper typing
+    const getDescriptionText = (description: DescriptionBlock[]): string => {
         if (!description || !Array.isArray(description)) return "";
 
         return description
             .map((block) => {
                 if (block.type === "paragraph" && block.children) {
-                    return block.children.map((child: any) => child.text || "").join("");
+                    return block.children.map((child: DescriptionChild) => child.text || "").join("");
                 }
                 return "";
             })

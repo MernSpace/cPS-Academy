@@ -10,28 +10,64 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
+// ✅ Define proper TypeScript interfaces
+interface DescriptionChild {
+  text: string;
+  [key: string]: unknown; // Allow for other properties that might exist
+}
+
+interface DescriptionBlock {
+  type: string;
+  children: DescriptionChild[];
+  [key: string]: unknown; // Allow for other properties that might exist
+}
+
+interface ThumbnailFormats {
+  thumbnail?: {
+    url: string;
+  };
+  small?: {
+    url: string;
+  };
+  medium?: {
+    url: string;
+  };
+  large?: {
+    url: string;
+  };
+  [key: string]: unknown; // Allow for other format sizes
+}
+
+interface Thumbnail {
+  id: number;
+  documentId: string;
+  name: string;
+  url: string;
+  formats?: ThumbnailFormats;
+}
+
 interface Course {
   id: number;
   documentId: string;
   title: string;
-  description: any[]; // Rich text from Strapi
+  description: DescriptionBlock[]; // Rich text from Strapi with proper typing
   instructor?: string;
   duration?: string;
   level?: string;
-  thumbnail?: {
-    id: number;
-    documentId: string;
-    name: string;
-    url: string;
-    formats?: any;
-  };
+  thumbnail?: Thumbnail;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
 }
 
+interface Feature {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+}
+
 export default function Landing() {
-  const features = [
+  const features: Feature[] = [
     {
       icon: BookOpen,
       title: 'Comprehensive Courses',
@@ -54,17 +90,13 @@ export default function Landing() {
     },
   ];
 
-
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // ✅ Fetch courses from Strapi
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-
-
         const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}api/courses?populate=*`, {
           headers: {
             "Content-Type": "application/json",
@@ -92,8 +124,6 @@ export default function Landing() {
       } catch (error) {
         console.error("Error fetching courses:", error);
         toast.error("Unable to load courses");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -107,7 +137,6 @@ export default function Landing() {
     // Otherwise, prepend the Strapi backend URL
     return `${process.env.NEXT_PUBLIC_STRAPI_URL?.replace(/\/$/, "")}${url}`;
   };
-
 
   return (
     <div className="min-h-screen bg-background">

@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Navbar } from '@/components/Navbar';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from "next/navigation";
 
@@ -59,8 +58,9 @@ export default function Auth() {
 
             toast.success('Logged in successfully!');
             navigate.push('/dashboard');
-        } catch (error: any) {
-            toast.error(error.message || 'Error logging in');
+        } catch (error) {
+            toast.error('Error logging in');
+            console.log(error)
         } finally {
             setLoading(false);
         }
@@ -106,8 +106,9 @@ export default function Auth() {
             navigate.push('/dashboard');
 
             toast.success('Account created successfully! You can now log in.');
-        } catch (error: any) {
-            toast.error(error.message || 'Error creating account');
+        } catch (error) {
+            toast.error('Error creating account');
+            console.log(error)
         } finally {
             setLoading(false);
         }

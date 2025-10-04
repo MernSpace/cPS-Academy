@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ChevronDown, ChevronUp, Play } from "lucide-react";
+import Image from "next/image";
 
 // ✅ Helper: safely generate absolute URLs for Strapi media
 const getStrapiMedia = (url?: string) => {
@@ -11,6 +12,15 @@ const getStrapiMedia = (url?: string) => {
     if (url.startsWith("http")) return url;
     return `${process.env.NEXT_PUBLIC_STRAPI_URL?.replace(/\/$/, "")}${url}`;
 };
+
+// ✅ Define proper TypeScript interfaces
+interface DescriptionChild {
+    text: string;
+}
+
+interface DescriptionBlock {
+    children: DescriptionChild[];
+}
 
 interface Module {
     id: number;
@@ -25,7 +35,7 @@ interface Course {
     id: number;
     documentId: string;
     title: string;
-    description: any[];
+    description: DescriptionBlock[];
     instructor: string;
     level: string;
     duration: string;
@@ -36,18 +46,25 @@ interface Course {
 }
 
 interface PageProps {
-    params: {
+    params: Promise<{
         courseId: string;
-    };
+    }>;
 }
 
 const Page = ({ params }: PageProps) => {
-    const { courseId } = params;
     const router = useRouter();
+    const [courseId, setCourseId] = useState<string>("");
     const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeVideo, setActiveVideo] = useState<string | null>(null);
     const [expandedModule, setExpandedModule] = useState<number | null>(null);
+
+    // ✅ Unwrap params promise
+    useEffect(() => {
+        params.then((resolvedParams) => {
+            setCourseId(resolvedParams.courseId);
+        });
+    }, [params]);
 
     // ✅ Check authentication
     useEffect(() => {
@@ -57,6 +74,8 @@ const Page = ({ params }: PageProps) => {
 
     // ✅ Fetch course with modules from Strapi
     useEffect(() => {
+        if (!courseId) return;
+
         const fetchCourse = async () => {
             try {
                 const jwt = localStorage.getItem("jwt");
@@ -135,10 +154,12 @@ const Page = ({ params }: PageProps) => {
                         />
                     </div>
                 ) : thumbnailUrl ? (
-                    <img
+                    <Image
                         src={thumbnailUrl}
                         alt={title}
                         className="w-full rounded-xl mb-4 shadow"
+                        width={500}
+                        height={500}
                     />
                 ) : (
                     <div className="w-full h-96 bg-gray-200 rounded-xl mb-4 flex items-center justify-center">
@@ -158,7 +179,7 @@ const Page = ({ params }: PageProps) => {
                 <div className="prose prose-gray">
                     {description?.map((block, index) => (
                         <p key={index}>
-                            {block.children?.map((child: any) => child.text || "").join(" ")}
+                            {block.children?.map((child) => child.text || "").join(" ")}
                         </p>
                     ))}
                 </div>
